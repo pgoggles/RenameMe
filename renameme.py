@@ -1,6 +1,8 @@
 import os
 import requests
 import re
+import json
+import yaml
 
 def createDict(directory = os.getcwd()):
 	files = os.listdir(directory)
