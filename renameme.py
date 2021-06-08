@@ -9,9 +9,15 @@ class RenameMe ():
 		self.mode = mode
 		self.formatString = formatString
 		self.directory = directory
+		self.configure()
 		self.videoDict = self.createDict(directory)
 		if (self.mode.lower() == 'movie'):
-			self.videoDict = self.parseMovieName(self.videoDict)
+			self.matchMovie()
+		else:
+			self.matchTV()
+	def configure(self):
+		with open("config.yml", "r") as ymlfile:
+			self.apikey = yaml.load(ymlfile)['themoviedb']['apikey']
 	def createDict(self, directory):
 		files = os.listdir(directory)
 		videoDict = {}
@@ -23,6 +29,8 @@ class RenameMe ():
 			except IndexError:
 					continue
 		return videoDict
+	def matchMovie(self):
+		self.parseMovieName(self)
 	def parseMovieName(self, videoDict):
 		for video in videoDict:
 			originalTitle = video
@@ -43,6 +51,22 @@ class RenameMe ():
 			video = video.rstrip()
 			videoDict[originalTitle]['parsedTitle'] = video
 		return videoDict
+	def lookupMovie(self):
+		for video in self.videoDict:
+			params = {
+				'query': self.videoDict[video]['parsedTitle'],
+				'api_key': self.apikey,
+			}
+			if ('year' in self.videoDict[video]):
+				params['year'] = self.videoDict[video]['year']
+			lookup = requests.get('https://api.themoviedb.org/3/search/movie', params=params)
+			movieData = lookup.json()
+			self.videoDict[video]['matchedTitle'] = movieData['results'][0]['title']
+			self.videoDict[video]['year'] = movieData['results'][0]['release_date'].split('-')[0]
+
+
+
+
 
 
 ### Define Constants ###
