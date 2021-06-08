@@ -31,6 +31,7 @@ class RenameMe ():
 		return videoDict
 	def matchMovie(self):
 		self.parseMovieName()
+		self.lookupMovie()
 	def parseMovieName(self):
 		for video in self.videoDict:
 			originalTitle = video
