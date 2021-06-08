@@ -3,7 +3,7 @@ import requests
 import re
 import json
 import yaml
-import pymediainfo
+from pymediainfo import MediaInfo
 
 class RenameMe ():
 	def __init__(self, mode, formatString = None, directory = os.getcwd()):
@@ -64,12 +64,34 @@ class RenameMe ():
 			self.videoDict[video]['year'] = movieData['results'][0]['release_date'].split('-')[0]
 	def mediaInfoLookup(self):
 		for video in self.videoDict:
-
-
-
-
-
-
+			mediaInfo = MediaInfo.parse(video)
+			for i in range (len(mediaInfo.tracks)):
+					if mediaInfo.tracks[i].track_type == 'Video' and 'videoTrack' not in self.videoDict[video]:
+						self.videoDict[video]['videoTrack'] = i
+					elif  mediaInfo.tracks[i].track_type == 'Audio' and 'audioTrack' not in self.videoDict[video]:
+						self.videoDict[video]['audioTrack'] = i
+			self.matchAudio(video, mediaInfo)
+	def matchAudio(self, video, mediaInfo):
+			audioInfo = mediaInfo.tracks[self.videoDict[video]['audioTrack']]
+			audioCodec = audioInfo.commercial_name
+			audioChannels = audioInfo.channel_s
+			audioExtended = ''
+			if audioChannels == 8:
+				audioChannels = '7.1'
+			if audioChannels == 6:
+				audioChannels = '5.1'
+			elif audioChannels == 2:
+				audioChannels = '2.0'
+			if audioCodec == 'Dolby Digital Plus with Dolby Atmos':
+				audioCodec = 'DDP'
+				audioExtended = 'Atmos'
+			elif audioCodec == 'Dolby Digital Plus':
+				audioCodec = 'DDP'
+			elif audioCodec == 'Dolby Digital':
+				audioCodec = 'DD'
+			self.videoDict[video]['audioChannels'] = audioChannels
+			self.videoDict[video]['audioCodec'] = audioCodec
+			self.videoDict[video]['audioExtended'] = audioExtended
 
 ### Define Constants ###
 videoExtensions = ['mkv', 'mp4', 'avi']
