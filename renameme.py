@@ -30,27 +30,23 @@ class RenameMe ():
 					continue
 		return videoDict
 	def matchMovie(self):
-		self.parseMovieName(self)
-	def parseMovieName(self, videoDict):
-		for video in videoDict:
+		self.parseMovieName()
+	def parseMovieName(self):
+		for video in self.videoDict:
 			originalTitle = video
-			# Try to split title based on resolution#
 			resolution = re.findall(r"[0-9][0-9][0-9][0-9]p", video)
 			if resolution == []:
 					resolution = re.findall(r"[0-9][0-9][0-9]p", video)
 			if resolution != []:
 				video = video.split(resolution[0])[0]
-			#Try to split title based on year#:
 			year = re.findall(r"[0-9][0-9][0-9][0-9]", video)
 			if year != []:
 				video = video.split(year[0])[0]
 				year = year[0]
-				videoDict[originalTitle]['year'] = year
-			#Replace spaces in filename#
+				self.videoDict[originalTitle]['year'] = year
 			video = video.replace('.', ' ')
 			video = video.rstrip()
-			videoDict[originalTitle]['parsedTitle'] = video
-		return videoDict
+			self.videoDict[originalTitle]['parsedTitle'] = video
 	def lookupMovie(self):
 		for video in self.videoDict:
 			params = {
