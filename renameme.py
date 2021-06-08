@@ -70,6 +70,7 @@ class RenameMe ():
 						self.videoDict[video]['videoTrack'] = i
 					elif  mediaInfo.tracks[i].track_type == 'Audio' and 'audioTrack' not in self.videoDict[video]:
 						self.videoDict[video]['audioTrack'] = i
+			self.matchVideo(video, mediaInfo)
 			self.matchAudio(video, mediaInfo)
 	def matchAudio(self, video, mediaInfo):
 			audioInfo = mediaInfo.tracks[self.videoDict[video]['audioTrack']]
@@ -92,6 +93,41 @@ class RenameMe ():
 			self.videoDict[video]['audioChannels'] = audioChannels
 			self.videoDict[video]['audioCodec'] = audioCodec
 			self.videoDict[video]['audioExtended'] = audioExtended
+	def matchVideo(self, video, mediaInfo):
+		videoInfo = mediaInfo.tracks[self.videoDict[video]['videoTrack']]
+		videoCodec = videoInfo.format
+		if videoCodec == 'AVC':
+			videoCodec = 'H.264'
+		elif videoCodec == 'HEVC':
+			videoCodec = 'H.265'
+		videoWidth = videoInfo.width
+		videoHeight = videoInfo.height
+		videoResolution = str(videoHeight) + 'p'
+		if (videoWidth == 3840 or videoHeight == 2160):
+			videoResolution = '2160p'
+		elif (videoWidth == 1920 or videoHeight == 1080):
+			videoResolution = '1080p'
+		elif (videoWidth == 1280 or videoWidth  == 1248 or videoHeight == 720):
+			videoResolution = '720p'
+		elif (videoHeight == 576 and videoWidth != 1280):
+			videoResolution = '576p'
+		elif (videoHeight == 480 and videoWidth != 1280):
+			videoResolution = '480p'
+		elif (videoHeight == 360):
+			videoResolution = '360p'
+		videoHDR = videoInfo.hdr_format
+		if (videoHDR == 'SMPTE ST 2086'):
+			videoHDR = 'HDR'
+		elif (videoHDR == 'Dolby Vision'):
+			videoHDR = 'DV'
+		elif (str(videoHDR) == "None" and videoInfo.color_primaries == 'BT.2020'):
+			videoHDR = 'HDR'
+		elif (str(videoHDR) == "None"):
+			videoHDR = ''
+		self.videoDict[video]['videoCodec'] = videoCodec
+		self.videoDict[video]['videoResolution'] = videoResolution
+		self.videoDict[video]['videoHDR'] = videoHDR
+
 
 ### Define Constants ###
 videoExtensions = ['mkv', 'mp4', 'avi']
