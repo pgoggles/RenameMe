@@ -3,6 +3,7 @@ import requests
 import re
 import json
 import yaml
+import pymediainfo
 
 class RenameMe ():
 	def __init__(self, mode, formatString = None, directory = os.getcwd()):
@@ -32,6 +33,7 @@ class RenameMe ():
 	def matchMovie(self):
 		self.parseMovieName()
 		self.lookupMovie()
+		self.mediaInfoLookup()
 	def parseMovieName(self):
 		for video in self.videoDict:
 			originalTitle = video
@@ -60,6 +62,9 @@ class RenameMe ():
 			movieData = lookup.json()
 			self.videoDict[video]['matchedTitle'] = movieData['results'][0]['title']
 			self.videoDict[video]['year'] = movieData['results'][0]['release_date'].split('-')[0]
+	def mediaInfoLookup(self):
+		for video in self.videoDict:
+
 
 
 
